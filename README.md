@@ -1,6 +1,6 @@
 # StockSense Python (Flask)
 
-StockSense AI is a small web app that forecasts stock **closing prices** using two models:
+StockSense Python is a small web app that forecasts stock **closing prices** using two models:
 - **LSTM** (TensorFlow/Keras)
 - **Prophet** (Facebook Prophet)
 
