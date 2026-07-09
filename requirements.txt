@@ -1,0 +1,8 @@
+flask
+flask-cors
+yfinance>=0.2.0
+pandas
+numpy
+scikit-learn
+tensorflow-cpu
+prophet

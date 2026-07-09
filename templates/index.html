@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Price Predictor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ──────────── HEADER ──────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+          <polyline points="16 7 22 7 22 13"/>
+        </svg>
+        <span>StockSense <span class="badge">PYTHON</span></span>
+      </div>
+      <p class="subtitle">LSTM &amp; Prophet Forecasting Engine</p>
+    </div>
+  </header>
+
+  <!-- ──────────── MAIN ──────────── -->
+  <main>
+
+    <!-- CONTROL PANEL -->
+    <section class="card control-card">
+      <h2>Configure Prediction</h2>
+
+      <div class="input-row">
+        <div class="field">
+          <label for="ticker">Stock Ticker</label>
+          <input id="ticker" type="text" placeholder="e.g. AAPL, GOOGL, AMZN"
+                 autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        </div>
+
+        <div class="field">
+          <label for="days">Forecast Horizon</label>
+          <select id="days">
+            <option value="7">Next 7 days</option>
+            <option value="30">Next 30 days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button id="btn-lstm" class="btn btn-lstm" onclick="predictSingle('lstm')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Predict with LSTM
+        </button>
+        <button id="btn-prophet" class="btn btn-prophet" onclick="predictSingle('prophet')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          Predict with Prophet
+        </button>
+        <button id="btn-compare" class="btn btn-compare" onclick="predictCompare()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Compare Both Models
+        </button>
+      </div>
+
+      <!-- How it works tip -->
+      <details class="tip">
+        <summary>How does this work?</summary>
+        <ul>
+          <li><strong>LSTM</strong> (Long Short-Term Memory) is a deep-learning model trained on the last 2 years of closing prices. It learns temporal patterns and sequence dependencies.</li>
+          <li><strong>Prophet</strong> is Meta's time-series model that decomposes trends, weekly seasonality, and yearly seasonality for robust forecasting.</li>
+          <li><strong>RMSE</strong> (Root Mean Squared Error) measures prediction accuracy on held-out test data — lower is better.</li>
+          <li>Results are for <em>educational purposes</em> only and should not be used for financial decisions.</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- LOADING -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p id="loading-msg">Training model and fetching data…</p>
+      <p class="loading-sub">LSTM training takes ~30–60 s on CPU. Please wait.</p>
+    </div>
+
+    <!-- ERROR BANNER -->
+    <div id="error-banner" class="error-banner hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="error-text"></span>
+    </div>
+
+    <!-- RESULTS (hidden until data arrives) -->
+    <div id="results" class="hidden">
+
+      <!-- Ticker info bar -->
+      <div class="ticker-bar">
+        <span id="result-ticker" class="ticker-label"></span>
+        <span id="result-last-price" class="last-price"></span>
+        <span id="result-days" class="horizon-badge"></span>
+      </div>
+
+      <!-- RMSE cards -->
+      <div id="rmse-row" class="rmse-row"></div>
+
+      <!-- Charts grid -->
+      <div class="charts-grid">
+
+        <!-- Historical prices -->
+        <section class="card chart-card">
+          <h3>Historical Closing Prices <span class="chart-sub">(last 90 days)</span></h3>
+          <div class="chart-wrap">
+            <canvas id="chart-history"></canvas>
+          </div>
+        </section>
+
+        <!-- Forecast -->
+        <section class="card chart-card">
+          <h3 id="forecast-title">Forecast</h3>
+          <div class="chart-wrap">
+            <canvas id="chart-forecast"></canvas>
+          </div>
+        </section>
+
+        <!-- Validation (actual vs predicted) -->
+        <section class="card chart-card full-width" id="validation-section">
+          <h3>Model Validation <span class="chart-sub">(test set: actual vs predicted)</span></h3>
+          <div class="chart-wrap">
+            <canvas id="chart-validation"></canvas>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Prediction table -->
+      <section class="card">
+        <h3>Predicted Values</h3>
+        <div id="pred-table-wrap" class="table-wrap"></div>
+      </section>
+
+    </div><!-- /results -->
+
+  </main>
+
+  <footer>
+    <p>StockSense AI — powered by LSTM &amp; Prophet · Data via yfinance · For educational use only</p>
+  </footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
